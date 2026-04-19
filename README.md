@@ -66,6 +66,13 @@ pip install -r requirements.txt
 
 4. Point **Meta WhatsApp** webhook to `https://<your-public-host>/webhooks/whatsapp` and **Recall** (if used) to `https://<your-public-host>/webhooks/recall`.
 
+## Deploy on Render
+
+1. Ensure the repo root contains `render.yaml` (Blueprint) and `runtime.txt` (Python 3.12).
+2. In [Render](https://render.com), create a **Blueprint**, connect `Talha-229/Whatsapp-Project-Manager`, branch `main`, path `render.yaml`.
+3. After deploy, open the web service **Environment** and fill every variable (same as local `.env`). Set `PUBLIC_BASE_URL` to your service URL, e.g. `https://whatsapp-bot.onrender.com` (no trailing slash). Set `GOOGLE_REDIRECT_URI` to `{PUBLIC_BASE_URL}/oauth/google/callback`.
+4. Update **Meta** WhatsApp and **Recall** webhook URLs to use `PUBLIC_BASE_URL`, and add the Google OAuth redirect URI in Google Cloud Console.
+
 ## Configuration (environment variables)
 
 | Variable | Purpose |

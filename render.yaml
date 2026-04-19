@@ -1,0 +1,56 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# After deploy, set env vars in the Render dashboard (Environment).
+# Set PUBLIC_BASE_URL to your service URL, e.g. https://whatsapp-bot.onrender.com
+# Update Meta WhatsApp + Recall webhooks and Google OAuth redirect to use that URL.
+
+services:
+  - type: web
+    name: whatsapp-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: SECRET_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: META_WA_VERIFY_TOKEN
+        sync: false
+      - key: META_WA_ACCESS_TOKEN
+        sync: false
+      - key: META_WA_PHONE_NUMBER_ID
+        sync: false
+      - key: META_WA_APP_SECRET
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: WHISPER_MODEL
+        value: whisper-1
+      - key: DEFAULT_TZ
+        value: UTC
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: GOOGLE_TOKEN_ENCRYPTION_KEY
+        sync: false
+      - key: RECALL_API_KEY
+        sync: false
+      - key: RECALL_REGION
+        value: us-east-1
+      - key: RECALL_BOT_NAME
+        value: WhatsApp Notetaker
+      - key: RECALL_WEBHOOK_SECRET
+        sync: false
