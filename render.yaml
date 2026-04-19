@@ -1,7 +1,7 @@
 # Render Blueprint: https://render.com/docs/blueprint-spec
-# After deploy, set env vars in the Render dashboard (Environment).
-# Set PUBLIC_BASE_URL to your service URL, e.g. https://whatsapp-bot.onrender.com
-# Update Meta WhatsApp + Recall webhooks and Google OAuth redirect to use that URL.
+# Non-secret defaults use `value:` so they appear in the Blueprint review.
+# Secrets use `sync: false` (set in the Render dashboard) or `generateValue: true`.
+# After deploy: set PUBLIC_BASE_URL to your Render URL; align GOOGLE_REDIRECT_URI and webhooks.
 
 services:
   - type: web
@@ -12,14 +12,26 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
+      # App (see app/config.py — names are UPPER_SNAKE_CASE in env)
+      - key: APP_NAME
+        value: WhatsApp Agent API
+      - key: DEBUG
+        value: "false"
+      # Required for Google OAuth state signing (ItsDangerous); auto-generated on Render
       - key: SECRET_KEY
-        sync: false
+        generateValue: true
+      - key: LANGGRAPH_MAX_CLARIFY_TURNS
+        value: "2"
+
+      # Supabase + Postgres (LangGraph checkpoints)
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: DATABASE_URL
         sync: false
+
+      # Meta WhatsApp Cloud API
       - key: META_WA_VERIFY_TOKEN
         sync: false
       - key: META_WA_ACCESS_TOKEN
@@ -28,8 +40,11 @@ services:
         sync: false
       - key: META_WA_APP_SECRET
         sync: false
+
       - key: PUBLIC_BASE_URL
         sync: false
+
+      # OpenAI — models & timezone (defaults; override in dashboard if needed)
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_MODEL
@@ -38,6 +53,8 @@ services:
         value: whisper-1
       - key: DEFAULT_TZ
         value: UTC
+
+      # Google Calendar OAuth
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -46,6 +63,8 @@ services:
         sync: false
       - key: GOOGLE_TOKEN_ENCRYPTION_KEY
         sync: false
+
+      # Recall.ai (optional)
       - key: RECALL_API_KEY
         sync: false
       - key: RECALL_REGION

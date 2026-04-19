@@ -77,7 +77,10 @@ pip install -r requirements.txt
 
 | Variable | Purpose |
 |----------|---------|
-| `SECRET_KEY` | App secret (sessions/signing) |
+| `SECRET_KEY` | Signs Google OAuth state (Calendar linking); use a long random string |
+| `APP_NAME` | API title (default `WhatsApp Agent API`) |
+| `DEBUG` | `true` / `false` |
+| `LANGGRAPH_MAX_CLARIFY_TURNS` | Max clarification turns before the agent answers (default `2`) |
 | `SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role key (server-side only) |
 | `DATABASE_URL` | Postgres URI for LangGraph checkpoints (Supabase DB) |
