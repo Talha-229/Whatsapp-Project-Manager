@@ -1,7 +1,7 @@
 import logging
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from googleapiclient.discovery import build
@@ -58,10 +58,15 @@ def resolve_meeting_plan(
     if not start_iso:
         return (None, "When should the meeting start? (e.g. tomorrow 3pm)")
 
+    tz_default = ZoneInfo(s.default_tz)
     try:
         start = datetime.fromisoformat(start_iso.replace("Z", "+00:00"))
     except Exception:
         return (None, "I could not understand the date/time. Please try e.g. 2026-04-20T15:00:00+03:00")
+
+    # Naive ISO = wall clock in DEFAULT_TZ (documented in tool strings). Do not leave naive past this point.
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=tz_default)
 
     if end_iso:
         try:
@@ -70,6 +75,8 @@ def resolve_meeting_plan(
             end = start + timedelta(hours=1)
     else:
         end = start + timedelta(hours=1)
+    if end.tzinfo is None:
+        end = end.replace(tzinfo=tz_default)
 
     explicit = list(
         dict.fromkeys([e.strip().lower() for e in (attendee_emails or []) if e and "@" in e])
@@ -113,8 +120,19 @@ def format_meeting_preview(plan: ResolvedMeetingPlan) -> str:
         f"• Invitees: {inv}",
         f"• Reminder ping: {plan.reminder_lead_minutes} minutes before",
         "",
-        "Reply yes or confirm if this is correct. If anything should change, say what to fix.",
     ]
+    # Same instant in UTC — helps when Google Calendar week view is set to GMT/UTC (shows a different clock time).
+    su = plan.start.astimezone(timezone.utc)
+    eu = plan.end.astimezone(timezone.utc)
+    lines.append(
+        f"• Same time in UTC (if your Calendar view uses GMT): {su.strftime('%H:%M')}–{eu.strftime('%H:%M')} UTC."
+    )
+    lines.extend(
+        [
+            "",
+            "Reply yes or confirm if this is correct. If anything should change, say what to fix.",
+        ]
+    )
     return "\n".join(lines)
 
 

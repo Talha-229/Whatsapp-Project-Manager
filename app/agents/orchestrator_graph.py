@@ -50,7 +50,11 @@ def _authoritative_time_block() -> str:
     return (
         "Current date and time (authoritative): "
         f"{now.strftime('%A, %B %d, %Y')} — {now.strftime('%H:%M')} "
-        f"({s.default_tz}); ISO {now.isoformat(timespec='seconds')}."
+        f"({s.default_tz}); ISO {now.isoformat(timespec='seconds')}.\n\n"
+        "Calendar booking (preview_calendar_meeting / create_calendar_meeting): pass start_iso and end_iso as "
+        f"**local wall times in {s.default_tz}** — either `YYYY-MM-DDTHH:MM:SS` with **no** timezone suffix "
+        "(interpreted as that zone) or with an explicit offset (e.g. +05:00 for Pakistan). "
+        "Use a trailing **Z** only when the instant is genuinely UTC; **Z is not** “evening local time”."
     )
 
 
